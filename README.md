@@ -1,177 +1,101 @@
-# 💳 Wallet demo, an Advanced iOS Fintech Wallet — Clean Architecture, SwiftUI & SwiftData
+# 📱 WalletDemo, an Advanced iOS Fintech Wallet — Clean Architecture, SwiftUI & SwiftData
 
-[![iOS 17.0+](https://shields.io)](https://apple.com)
-[![Swift 5.10](https://shields.io)](https://swift.org)
+[![Swift](https://shields.io)](https://swift.org)
+[![iOS](https://shields.io)](https://apple.com)
+[![SwiftUI](https://shields.io)](https://apple.com)
 [![SwiftData](https://shields.io)](https://apple.com)
-[![SwiftCharts](https://shields.io)](https://apple.com)
+[![Architecture](https://shields.io)]()
 
-A high-performance, native digital wallet (Fintech) application developed in **SwiftUI** for iOS 17+. The project implements a modular **Feature-Driven MVVM Architecture**, decoupled navigation engines (Push/Sheet Coordinators), hybrid biometric authentication, and an encrypted local relational persistence system using **SwiftData**.
+### 📄 Description
+**WalletDemo** is a native iOS application simulating a fully local digital wallet ecosystem. The project was built using a highly modular and decoupled approach, eliminating external API dependencies by leveraging **SwiftData** for all persistent data storage and local relationship management. 
 
-The application's layout and tactile interactions have been built strictly adhering to the **Apple Human Interface Guidelines (HIG)**, ensuring premium usability, universal accessibility, and adaptive hardware haptic feedback.
-
----
-
-## 🏛️ Architecture and Design Patterns
-
-The project rejects traditional highly-coupled hierarchies and adopts a modern **Feature-Driven Architecture** combined with up-to-date SwiftUI patterns:
-
-```text
-
-┌────────────────────────────────────────────────────────────────────────┐
-│                              RootContentView                           │
-│                     (Exclusión Mutua de Flujos Generales)              │
-└─────────────────────────────────┬──────────────────────────────────────┘
-                                  │
-         ┌────────────────────────┼────────────────────────┐
-         ▼                        ▼                        ▼
-┌─────────────────┐      ┌─────────────────┐      ┌──────────────────┐
-│ Onboarding Flow │      │   Login Flow    │      │  Main App (Tabs) │
-│   (Bienvenida)  │      │ (Seguridad/PIN) │      │  (Dashboard Core)│
-└─────────────────┘      └─────────────────┘      └──────────────────┘
-         │                        │                        │
-         └────────────────────────┼────────────────────────┘
-                                  ▼
-                     ┌───────────────────────────┐
-                     │     AppStateManager       │
-                     │ (Persistencia SwiftData)  │
-                     └───────────────────────────┘
-
-```
-
-### 1. Environment Injection (`@Environment`) vs Constructor Parameters
-* **Sequential Multi-step Flows (Wizards):** Within the Registration module (6 successive screens), a **single centralized ViewModel injected via the view environment (`.environment`)** is used. This completely eliminates *Parameter Tunneling*, optimizes RAM usage, and allows data to accumulate in a clean, progressive manner until the final API submission.
-* **Atomic Components:** Isolated, reusable views (such as `CardView` or `TransactionRow`) receive explicit dependencies through their constructors, maximizing immutability and rendering speeds in Xcode Previews (`#Preview`).
-
-### 2. Decoupled Programmatic Routing
-The use of implicit `NavigationLink` markers hidden deep inside the view tree has been eradicated. Instead, navigation is 100% programmatically controlled via an observable `NavigationRouter` class bound directly to the iOS 17 native `NavigationPath`.
-* **Push Navigation:** Utilized for deep flows that maintain a clear linear hierarchy (Registration wizard, transactional history, credentials management).
-* **Sheet/Cover Presentation:** Utilized for sharp contextual workflows (Transaction receipts, QR payment dialogs). Upon workflow completion, the active router dispatches a coordinated `popToRoot()` or `dismissSheet()` call to prevent memory leaks or stranded overlay states.
-
-### 3. Boot Flow Safeguards (Mutual Exclusion)
-To mitigate visual bugs during app launches (where the main dashboard briefly rendered over the security keypad), the root coordinator `RootContentView` implements an explicit conditional `Group` with structural view IDs (`.id("flow_name")`). This forces SwiftUI to **completely purge inactive workflows from RAM** and draw the selected environment from scratch using asynchronous transitions.
+This repository showcases advanced iOS development practices, featuring modern navigation workflows, native biometric security, structured concurrency, and elegant data visualization using Apple's official frameworks.
 
 ---
 
-## ⚡ Core Features & Technical Highlights
+### 📸 UI/UX Preview
 
-### 🔒 Bank-Grade Security Suite & Hybrid Login
-* **Two-Layer Authentication:** A clear separation is maintained between remote validation (Email/Password verified against optimized queries in SwiftData) and daily quick local validation (4-digit PIN + FaceID/TouchID).
-* **Tailored Tactile Keypad:** Built from custom circular buttons. The system captures numeric input using an invisible native `TextField` and dispatches a **horizontal shake animation (Shake Effect)** combined with a heavy hardware error haptic impulse (`.error`) if the validation fails.
-* **Predictive Regex Validation:** The email entry fields and the secure password checklist evaluate text strings in real time using native regular expressions over fully normalized data (`.trimmedAndLowercased()`), filtering out broken formats or accidental white spaces.
-
-### 📷 QR Operations & Pixel-Perfect CoreImage
-* **Dynamic QR Code Generation:** Utilizes the built-in CoreImage filter `CIQRCodeGenerator`, locking error correction to High level ("H"). The SwiftUI `.interpolation(.none)` modifier is applied to disable pixel antialiasing, yielding sharp, high-contrast matrix barcodes that remain scannable under extreme glare conditions.
-* **Hybrid Scanner Architecture:** Utilizing compile-time directives (`#if targetEnvironment(simulator)`), the application dynamically checks its host. On a Mac simulator, it renders an interactive testing override to inject mock transaction data payload. On a physical iPhone, it instantiates a native hardware capture session via `AVFoundation` bridged through a custom `UIViewRepresentable`.
-
-### 📊 Financial Insights with SwiftCharts
-A macro-level view of consumption trends is integrated through Apple’s native data visualization framework.
-* Data bars utilize semantic gradients based on the main brand color (`Color.accentColor.gradient`), automatically highlighting only the highest peak of the 6-month historical dataset.
-* Adheres to HIG principles by rendering minimalist background grids with dashed styling, simplifying Y-axis numeric labels to keep the dashboard clear and scannable.
-
-### 💾 Relational Persistence via SwiftData
-All business data (Cards, Movements, Profiles, and P2P Contacts) persists inside an encrypted local SQLite relational database within the app's secure sandbox.
-* **Hardware Singleton Pattern:** To completely solve a well-known CoreData/SwiftData bug (`Persistent History has to be truncated due to entities being removed`), container initialization was centralized into a thread-safe static property (`SharedModelContainer.shared`). This prevents the `AppStateManager` and the `@main` window from opening conflicting concurrent channels against the same physical file on disk.
-* **Cascade Delete Rules:** Models implement explicit relationships (`@Relationship(deleteRule: .cascade)`). When a user deletes a credit card from its contextual security menu, the system automatically purges all connected ledger transactions, keeping the phone clean of orphaned data.
+| Onboarding & Login | Dashboard & Analytics | QR Payments            | P2P Contacts           |
+| ------------------ | --------------------- | ---------------------- | ---------------------- |
+| <img width="220" alt="Simulator Screenshot - iPhone 17 Pro - 2026-09-24 at 13 46 51" src="https://github.com/user-attachments/assets/2cf62b7f-9926-44c5-b697-dcf951ee491d" />| <img width="220" alt="Simulator Screenshot - iPhone 17 Pro - 2026-09-24 at 13 48 59" src="https://github.com/user-attachments/assets/3075678e-69bd-45fd-8b9d-df66cee5d194" /> | <img width="220" alt="Simulator Screenshot - iPhone 17 Pro - 2026-09-24 at 13 50 09" src="https://github.com/user-attachments/assets/1ec70230-8c66-4f10-b860-7bc82fd0353d" /> | <img width="220" alt="Simulator Screenshot - iPhone 17 Pro - 2026-09-24 at 13 51 06" src="https://github.com/user-attachments/assets/d3a32d5b-af05-4271-bef3-96ceb9f7bad6" /> |
 
 ---
 
-## 🎨 Apple Human Interface Guidelines (HIG) Compliance
+### ⚙️ Core Architecture & Key Concepts
 
-* **Semantic and Restrained Color Use:** Transaction amounts on the home feed are styled strictly using the standard primary font color (`.primary`), relying on explicit mathematical symbols (`+` or `-`) for financial category definition. This closely emulates the official *Apple Wallet* experience, avoiding visual clutter and ensuring an accessible contrast ratio approved for users with visual impairments.
-* **Universal Feedback Infrastructure:** Integrated modern empty states via `ContentUnavailableView` (iOS 17). Unloaded panels smoothly guide users using dynamic SF Symbols animated via continuous layer pulsing (`.symbolEffect(.pulse)`).
-* **Destructive Action Guards:** Before removing any payment method, a native confirmation modal is displayed. The confirming button automatically adopts a distinct red accent tint (`role: .destructive`), while the cancel alternative takes structural focus in bold (`role: .cancel`) to safeguard user data against accidental taps.
-
----
-
-## 🚀 System Requirements
-
-* **Xcode 15.0+**
-* **Swift 5.9+**
-* **iOS 17.0+** (Required for the native `@Observable` macro, SwiftCharts, and the SwiftData persistent context layer)
-* **Physical Device:** Required exclusively for opening real camera video capture layers within the QR scanner module.
+*   **MVVM Architecture:** Strict separation of concerns. ViewModels manage UI state and business logic utilizing iOS 17's new `@Observable` macro.
+*   **Decoupled Navigation Engine:** A centralized, clean navigation system routing complex user flows through `NavigationStack`, `Sheets`, and `FullScreenCover` without coupling logic inside SwiftUI views.
+*   **Modern Concurrency:** Full integration of `async/await` to simulate asynchronous work during intensive operations such as transaction processing and simulated account setups.
+*   **Native Persistence:** Built with **SwiftData** to seamlessly handle local database relationships between users, payment cards, transactions, and contacts.
 
 ---
 
-## 📂 Architecture Directory Tree
-```text
-WalletApp/
-│
-├── 🚀 Core/
-│   ├── WalletApp.swift                 # Punto de entrada de la App (.modelContainer)
-│   ├── RootContentView.swift           # Exclusión mutua de flujos (.onboarding, .login, .mainApp)
-│   └── AppStateManager.swift           # Motor global de estado y Singleton de SwiftData
-│
-├── 💾 Data/
-│   ├── Models/
-│   │   ├── UserSession.swift           # @Model - Sesión, PIN, Biometría e Info de usuario
-│   │   ├── PersistentCard.swift        # @Model - Tarjetas físicas/virtuales y gradientes
-│   │   ├── PersistentTransaction.swift # @Model - Historial de movimientos relacionales
-│   │   └── PersistentContact.swift     # @Model - Contactos P2P y favoritos
-│   │
-│   └── Shared/
-│       └── SharedModelContainer.swift  # Singleton de hardware para evitar corrupciones de CoreData
-│
-├── 🎛️ Navigation/
-│   ├── NavigationRouter.swift          # Clase genérica @Observable para rutas Push
-│   └── HomeNavigationRouter.swift      # Router especializado con control de Push + Sheets modales
-│
-├── 📦 Modules/
-│   ├── 🍏 Onboarding/
-│   │   ├── OnboardingContainerView.swift# Carrusel de introducción y accesos directos
-│   │   └── OnboardingSubViews.swift    # Pantallas estáticas del carrusel de bienvenida
-│   │
-│   ├── 🔑 Registration/
-│   │   ├── RegistrationFlowContainer.swift # Orquestador Push del Wizard de Registro
-│   │   ├── RegistrationViewModel.swift # ViewModel único inyectado por @Environment
-│   │   ├── RegEmailInputView.swift     # Paso 1: Email con validación estricta Regex
-│   │   ├── RegOTPValidationView.swift  # Pasos 2 y 4: Entrada segmentada sin botón de submit
-│   │   ├── RegPhoneInputView.swift     # Paso 3: Celular con menú desplegable de banderas
-│   │   ├── RegPasswordInputView.swift  # Paso 5: Inputs seguros con checklist de requerimientos
-│   │   └── RegPersonalDataFormView.swift# Paso 6: Formulario final con inyección a SwiftData
-│   │
-│   ├── 🔒 Login/
-│   │   ├── LoginFlowContainer.swift    # Orquestador híbrido (Primer login vs Acceso cotidiano)
-│   │   ├── LoginViewModel.swift        # ViewModel con autenticación encriptada asíncrona
-│   │   ├── LoginTraditionalView.swift  # Login por email/clave con spinner e inline validation
-│   │   ├── LoginBiometricsSetupView.swift # Enrolamiento inicial rápido de FaceID
-│   │   ├── LoginPINSetupView.swift     # Creación y confirmación del PIN inicial
-│   │   └── LoginRegularAccessView.swift# Pantalla diaria de bloqueo con autodisparo biométrico
-│   │
-│   ├── 🏠 Home/
-│   │   ├── HomeWalletView.swift        # Dashboard principal (Saludo, carrusel y actividad)
-│   │   ├── WalletViewModel.swift       # Controller de persistencia de tarjetas y data de SwiftCharts
-│   │   ├── AllTransactionsView.swift   # Historial completo LazyVStack agrupado por fecha
-│   │   └── AllTransactionsViewModel.swift # ViewModel de ordenamiento y filtrado por tags
-│   │
-│   ├── 📷 QROperations/
-│   │   ├── TabQRContainer.swift        # Selector segmentado unificado (.scan vs .share)
-│   │   ├── QROperationsViewModel.swift # Controller de hardware de cámara y cobros QR
-│   │   ├── ScannerModeView.swift       # Lógica híbrida: botón simulador / AVFoundation real
-│   │   ├── CameraPreviewView.swift     # UIViewRepresentable del visor nativo de captura de video
-│   │   ├── ShareModeView.swift         # Generador de códigos QR nítidos vía CoreImage
-│   │   └── PaymentConfirmationSheet.swift # Formulario de cobro con teclado táctil integrado
-│   │
-│   ├── ✈️ P2PContacts/
-│   │   ├── TabP2PContainer.swift       # Listado P2P LazyVStack con menús contextuales
-│   │   └── P2PContactViewModel.swift   # ViewModel transaccional asíncrono enlazado a SwiftData
-│   │
-│   └── ⚙️ Settings/
-│       ├── TabSettingsContainer.swift  # Listado estático .insetGrouped de configuración
-│       ├── SettingsViewModel.swift     # Controller de preferencias de hardware (UserDefaults)
-│       ├── ChangePINView.swift         # Módulo de cambio de PIN secuencial adaptativo
-│       ├── ChangePINViewModel.swift    # Validaciones del wizard de PIN con efectos de error
-│       ├── EditProfileView.swift       # Formulario con precarga HIG automática de datos actuales
-│       ├── EditProfileViewModel.swift  # Actualización del registro mutable del usuario
-│       ├── ChangePasswordView.swift    # Actualización segura de la clave del Keychain de Apple
-│       └── ChangePasswordViewModel.swift# Validaciones lógicas de la nueva clave de acceso
-│
-└── 🎨 SharedComponents/
-    ├── CardView.swift                  # Componente de la Tarjeta con Ojo de privacidad y Menú
-    ├── TransactionRow.swift            # Celda de movimiento con colores semánticos discretos (HIG)
-    ├── WalletAnalyticsCard.swift       # Gráfico analítico de barras nativo usando SwiftCharts
-    ├── UniversalFeedbackView.swift     # Interfaz universal animada para Éxitos y Fallos
-    ├── PINVerificationView.swift       # Cover de teclado numérico táctil con feedback háptico
-    └── Extensions/
-        ├── Color+Hex.swift             # Extensión para mapear gradientes bancarios vía Hex
-        └── String+Trim.swift           # Extensión de normalización de cadenas para búsquedas
-```
+### 📦 Application Modules
+
+#### 🚀 1. Onboarding & Hybrid Authentication
+*   **Local Registration:** Account creation and initial user profile storage managed via SwiftData.
+*   **Security Layer:** Hybrid login experience blending biometric authentication (Face ID/Touch ID via `LocalAuthentication`) with a secure fallback 
+PIN/password.
+
+#### 💳 2. Main Dashboard (Home)
+*   **Card Management:** Simulation of physical and virtual credit/debit card provisioning, customization, and deletion.
+*   **Transaction Ledger:** Dynamic, real-time transaction postings updated onto a history feed.
+*   **Visual Metrics:** A comprehensive financial overview rendered natively through interactive **SwiftCharts**.
+
+#### 🔍 3. QR Payment Module
+*   **Scanner Subsystem:** Camera-based scanner simulation to process immediate mock point-of-sale payments.
+*   **P2P QR Code:** Native generation and sharing of the user's specific QR code to receive inbound transactions.
+
+#### 👥 4. P2P Contacts & Transfers
+*   **Financial Directory:** Local contact book to add, update, and manage trusted peers.
+*   **Instant Transfers:** Seamless Peer-to-Peer (P2P) money transfer flow backed by local SwiftData models.
+
+#### ⚙️ 5. Settings & Profile Management
+*   Control panel allowing users to modify personal profiles, update passwords/PINs, and toggle biometric permissions on or off.
+
+---
+
+### 🧪 Unit Testing
+The project features a comprehensive suite of **Unit Tests built on Swift Testing** (Apple's modern testing framework).
+*   Validation of core ViewModel business logic.
+*   Data integrity testing for SwiftData container insertions and transaction updates.
+
+To execute the test suite, open Xcode and hit `CMD + U`.
+
+---
+
+### 🛠️ Tech Stack
+
+*   **Language:** Swift 5.10+ (`async/await`)
+*   **UI Framework:** SwiftUI (iOS 17.0+ Minimum Target)
+*   **Data Visualization:** SwiftCharts
+*   **Persistence Layer:** SwiftData
+*   **Testing Framework:** Swift Testing
+
+---
+
+### 🚀 Getting Started
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com
+   ```
+2. Navigate to the project root directory and launch it in Xcode:
+   ```bash
+   cd WalletDemo
+   open WalletDemo.xcodeproj
+   ```
+3. Target an iOS simulator running **iOS 17.0** or higher.
+4. Press `CMD + R` to build and run the application.
+
+> 💡 *Tip: To test the biometric login workflow in the simulator, go to the top menu bar and select **Features -> Face ID -> Enrolled**.*
+
+---
+
+### 👨‍💻 Author
+
+Developed by **Uziel Sabalza**
+*   **LinkedIn:** Uziel Sabalza (https://linkedin.com/in/uziel-sabalza-a535b6214)
+*   **Portfolio:** [Your Website](https://yourwebsite.com)
+*   **Email:** uziel.sabalza.dev@gmail.com
+
