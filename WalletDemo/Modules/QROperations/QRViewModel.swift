@@ -46,9 +46,6 @@ class QROperationsViewModel {
         return "wallet://p2p?user=\(walletUserID)&name=\(walletFullName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
     }
     
-    // Datos simulados de tu perfil que se convertirán en texto para el QR string
-    // let myWalletPayload: String = "wallet://p2p?user=juan_perez&id=99212A"
-    
     // 📷 Solicitar permisos de cámara en dispositivo físico
     func requestCameraPermission() {
     #if targetEnvironment(simulator)

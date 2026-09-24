@@ -26,7 +26,7 @@ struct ShareModeView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("\(appStateManager.currentUser?.firstName ?? "") \(appStateManager.currentUser?.lastName ?? "")")
                             .font(.headline)
-                        Text("@juan_perez • Wallet ID")
+                        Text("@uriel_sabalza • Wallet ID")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
