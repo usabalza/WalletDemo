@@ -95,7 +95,7 @@ To execute the test suite, open Xcode and hit `CMD + U`.
 ### 👨‍💻 Author
 
 Developed by **Uziel Sabalza**
-*   **LinkedIn:** Uziel Sabalza (https://linkedin.com/in/uziel-sabalza-a535b6214)
+*   **LinkedIn:** [Uziel Sabalza](https://linkedin.com/in/uziel-sabalza-a535b6214)
 *   **Portfolio:** [Your Website](https://yourwebsite.com)
 *   **Email:** uziel.sabalza.dev@gmail.com
 
