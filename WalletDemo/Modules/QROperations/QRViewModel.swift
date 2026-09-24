@@ -79,7 +79,7 @@ class QROperationsViewModel {
         // Extraer parámetros del Deep Link (user y name)
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         self.scannedUserID = components?.queryItems?.first(where: { $0.name == "user" })?.value ?? "Desconocido"
-        self.scannedUserName = components?.queryItems?.first(where: { $0.name == "name" })?.value ?? "Usuario Wallet"
+        self.scannedUserName = components?.queryItems?.first(where: { $0.name == "name" })?.value ?? "Desconocido"
         
         // Abrir la confirmación de pago con una animación sutil
         withAnimation(.spring()) {
