@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct AddContactFormView: View {
     var viewModel: P2PListViewModel

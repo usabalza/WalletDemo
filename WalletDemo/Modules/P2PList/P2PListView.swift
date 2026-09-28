@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct P2PListView: View {
     @State private var viewModel = P2PListViewModel()
