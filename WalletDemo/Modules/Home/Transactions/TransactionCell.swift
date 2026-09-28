@@ -28,12 +28,15 @@ struct TransactionCell: View {
                 VStack(alignment: .leading) {
                     Text(transaction.date.toShortString())
                         .font(.caption)
+                        .foregroundColor(.secondary)
                     Text(transaction.tagRaw)
+                        .foregroundColor(.primary)
                 }
                 
                 Spacer()
                 
                 Text("\(transaction.tag == .qrRecharge || transaction.tag == .p2pReceived ? "+" : "-") \(transaction.amount.toCurrency())")
+                    .foregroundColor(.primary)
                     .fontWeight(.bold)
             }
         }
